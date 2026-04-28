@@ -41,12 +41,9 @@ logo_html = f'<img src="data:image/png;base64,{logo_base64}" class="nav-logo">' 
 # --- UI / CSS ---
 st.markdown(f"""
 <style>
-    /* 1. FORCE LIGHT MODE & PREVENT DARK MODE OVERRIDE */
+    /* 1. GLOBAL OVERRIDES - KILL THE RED FOCUS RING */
     :root {{
-        --primary-color: #003366;
-        --background-color: #FFFFFF;
-        --secondary-background-color: #F0F2F6;
-        --text-color: #003366;
+        --primary-color: #003366 !important; /* Changes focus outline from red to IU Navy */
     }}
 
     [data-testid="stAppViewContainer"] {{
@@ -54,19 +51,14 @@ st.markdown(f"""
         color: #003366 !important;
     }}
 
-    /* Ensure all text remains dark blue/black even in dark mode */
-    h1, h2, h3, p, span, div, li {{
+    /* Force all text to stay IU Navy */
+    h1, h2, h3, p, span, div {{
         color: #003366 !important;
     }}
 
-    /* 2. NAVBAR & LOGO STYLING */
-    .stApp {{
-        margin-top: 80px;
-    }}
-    
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-    header {{visibility: hidden;}}
+    /* 2. NAVBAR */
+    .stApp {{ margin-top: 80px; }}
+    #MainMenu, footer, header {{ visibility: hidden; }}
 
     .navbar {{
         display: flex;
@@ -76,61 +68,70 @@ st.markdown(f"""
         padding: 10px 0;
         border-bottom: 6px solid #f8a51b;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
+        top: 0; left: 0; width: 100%;
         z-index: 9999;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
+    .nav-logo {{ height: 60px; }}
 
-    .nav-logo {{
-        height: 60px;
-    }}
-
-    /* 3. CHAT MESSAGE BUBBLES WITH COLOR ACCENTS */
+    /* 3. CHAT BUBBLES - THE COLOR BORDERS */
+    
+    /* Base Bubble Style */
     [data-testid="stChatMessage"] {{
         background-color: #FFFFFF !important;
-        border-radius: 15px !important;
-        padding: 15px !important;
+        border-radius: 12px !important;
+        padding: 18px !important;
         margin-bottom: 15px !important;
         border: 1px solid #E0E0E0 !important;
-        box-shadow: 3px 3px 10px rgba(0,0,0,0.05) !important;
+        box-shadow: 2px 5px 15px rgba(0,0,0,0.05) !important;
     }}
 
-    /* USER MESSAGE: Bold Blue Border on the Left */
+    /* USER MESSAGE: Left Blue Border */
     [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {{
-        border-left: 10px solid #003366 !important;
+        border-left: 12px solid #003366 !important;
     }}
 
-    /* BOT MESSAGE: IU Yellow Border on the Left */
+    /* BOT MESSAGE: Left Yellow Border */
     [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {{
-        border-left: 10px solid #f8a51b !important;
+        border-left: 12px solid #f8a51b !important;
     }}
 
-    /* Target the avatar backgrounds to match if desired */
+    /* Fix Avatar Icons to match */
     [data-testid="stChatMessageAvatarUser"] {{
         background-color: #003366 !important;
+        border-radius: 8px !important;
     }}
-    
     [data-testid="stChatMessageAvatarAssistant"] {{
         background-color: #f8a51b !important;
+        border-radius: 8px !important;
     }}
 
-    /* 4. CHAT INPUT STYLING */
-    div[data-testid="stChatInput"] {{
+    /* 4. CHAT INPUT - REMOVE RED ACTIVE STATE */
+    
+    /* Border when typing */
+    div[data-testid="stChatInput"] textarea {{
         border: 2px solid #003366 !important;
-        border-radius: 12px !important;
-        background-color: white !important;
+        color: #003366 !important;
+    }}
+
+    /* Remove the red outline on focus */
+    div[data-testid="stChatInput"] textarea:focus {{
+        box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.2) !important;
+        border-color: #003366 !important;
+        outline: none !important;
     }}
     
-    /* Hero Title Styling */
+    /* The outer container boundary */
+    div[data-testid="stChatInput"] {{
+        border: none !important;
+        background-color: transparent !important;
+    }}
+
     .hero-title {{
         text-align: center;
-        font-size: 30px;
-        font-weight: bold;
-        color: #003366 !important;
-        margin-top: 20px;
-        margin-bottom: 30px;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 25px;
     }}
 </style>
 
