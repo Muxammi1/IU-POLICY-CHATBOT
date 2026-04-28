@@ -38,7 +38,7 @@ logo_file = "LOGO-IU.png"
 logo_base64 = get_base64_of_bin_file(logo_file)
 logo_html = f'<img src="data:image/png;base64,{logo_base64}" class="nav-logo">' if logo_base64 else '<div class="nav-logo-text">IQRA UNIVERSITY</div>'
 
-# --- UI / CSS OVERHAUL ---
+# --- UI / CSS ---
 st.markdown(f"""
 <style>
     /* 1. FORCE LIGHT MODE & PREVENT DARK MODE OVERRIDE */
@@ -54,12 +54,12 @@ st.markdown(f"""
         color: #003366 !important;
     }}
 
-    /* Target all headers and text to stay dark blue */
-    h1, h2, h3, p, span, div {{
+    /* Ensure all text remains dark blue/black even in dark mode */
+    h1, h2, h3, p, span, div, li {{
         color: #003366 !important;
     }}
 
-    /* 2. NAVBAR STYLING */
+    /* 2. NAVBAR & LOGO STYLING */
     .stApp {{
         margin-top: 80px;
     }}
@@ -87,49 +87,50 @@ st.markdown(f"""
         height: 60px;
     }}
 
-    .nav-logo-text {{
-        color: white !important;
-        font-weight: bold;
-        font-size: 24px;
-        letter-spacing: 1px;
+    /* 3. CHAT MESSAGE BUBBLES WITH COLOR ACCENTS */
+    [data-testid="stChatMessage"] {{
+        background-color: #FFFFFF !important;
+        border-radius: 15px !important;
+        padding: 15px !important;
+        margin-bottom: 15px !important;
+        border: 1px solid #E0E0E0 !important;
+        box-shadow: 3px 3px 10px rgba(0,0,0,0.05) !important;
     }}
 
-    /* 3. HERO SECTION */
-    .hero-container {{
-        text-align: center;
-        padding: 40px 20px 20px 20px;
+    /* USER MESSAGE: Bold Blue Border on the Left */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {{
+        border-left: 10px solid #003366 !important;
     }}
 
-    .hero-title {{
-        font-size: 32px;
-        font-weight: 800;
-        color: #003366 !important;
-        margin-bottom: 10px;
+    /* BOT MESSAGE: IU Yellow Border on the Left */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {{
+        border-left: 10px solid #f8a51b !important;
     }}
 
-    .hero-subtitle {{
-        font-size: 16px;
-        color: #555 !important;
+    /* Target the avatar backgrounds to match if desired */
+    [data-testid="stChatMessageAvatarUser"] {{
+        background-color: #003366 !important;
+    }}
+    
+    [data-testid="stChatMessageAvatarAssistant"] {{
+        background-color: #f8a51b !important;
     }}
 
     /* 4. CHAT INPUT STYLING */
-    .stChatInputContainer {{
-        padding-bottom: 20px !important;
-        background-color: transparent !important;
-    }}
-    
     div[data-testid="stChatInput"] {{
         border: 2px solid #003366 !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
+        background-color: white !important;
     }}
-
-    /* 5. CHAT MESSAGE BUBBLES */
-    [data-testid="stChatMessage"] {{
-        background-color: #f8f9fa !important;
-        border-radius: 15px !important;
-        padding: 15px !important;
-        margin-bottom: 10px !important;
-        border: 1px solid #e0e0e0 !important;
+    
+    /* Hero Title Styling */
+    .hero-title {{
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        color: #003366 !important;
+        margin-top: 20px;
+        margin-bottom: 30px;
     }}
 </style>
 
@@ -137,10 +138,7 @@ st.markdown(f"""
     <div>{logo_html}</div>
 </div>
 
-<div class="hero-container">
-    <div class="hero-title">How can we help you today?</div>
-    <div class="hero-subtitle">Ask about IU policies, admissions, or campus details.</div>
-</div>
+<div class="hero-title">How can we help you today?</div>
 """, unsafe_allow_html=True)
 
 # --- Chat History Management ---
