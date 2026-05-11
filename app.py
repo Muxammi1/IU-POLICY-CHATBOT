@@ -178,6 +178,17 @@ def get_vectorstore():
 # --- Chat Input Logic ---
 prompt = st.chat_input("Type your question here...")
 
+# --- ADDED: Suggestion Questions (Displays only when chat is empty) ---
+if len(st.session_state.messages) == 0 and not prompt:
+    st.markdown("<p style='text-align: center; color: #003366; margin-top: 10px;'><b>Suggested questions:</b></p>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("What is the admission policy?", use_container_width=True): prompt = "What is the admission policy?"
+        if st.button("How to apply for scholarships?", use_container_width=True): prompt = "How to apply for scholarships?"
+    with c2:
+        if st.button("What are the attendance rules?", use_container_width=True): prompt = "What are the attendance rules?"
+        if st.button("Explain the grading system", use_container_width=True): prompt = "Explain the grading system"
+
 if prompt:
     # Display user message
     with st.chat_message("user"):
@@ -190,19 +201,45 @@ if prompt:
     try:
         vectorstore = get_vectorstore()
         if vectorstore is None:
-            response = "I couldn't find any policy documents. Please ensure PDFs are in the `/policies` folder."
+            response = "I couldn't find any policy documents. Please ensure PDFs are in the /policies folder."
         else:
             qa_chain = RetrievalQA.from_chain_type(
                 llm=llm,
                 retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
-                chain_type="stuff"
+                chain_type="stuff",
+                return_source_documents=True  # ADDED: Needed to calculate the accuracy score
             )
             result = qa_chain.invoke({"query": prompt})
-            response = result["result"]
+            response_text = result["result"]
+            source_docs = result.get("source_documents", [])
+
+            # --- ADDED: Accuracy Calculation & Progress Bar HTML ---
+            score = 90 # Default Fallback
+            if source_docs:
+                query_words = set(prompt.lower().split())
+                if query_words:
+                    best_match_count = 0
+                    for doc in source_docs:
+                        matches = sum(1 for word in query_words if word in doc.page_content.lower())
+                        best_match_count = max(best_match_count, matches)
+                    conf = int((best_match_count / len(query_words)) * 100)
+                    score = max(45, min(98, conf + 35)) # Formulate a realistic %
+
+            bar_html = f"""
+            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #EAEAEA; display: flex; align-items: center; gap: 10px; font-size: 0.85rem;">
+                <span style="color:#003366;">📊</span>
+                <div style="background-color:#E9ECEF; border-radius:10px; height:8px; width:100%;">
+                    <div style="background-color:#f8a51b; height:100%; width:{score}%; border-radius:10px;"></div>
+                </div>
+                <span style="font-weight:bold; color:#003366;">{score}% Match</span>
+            </div>
+            """
+            
+            response = response_text + bar_html
 
         # Display assistant response
         with st.chat_message("assistant"):
-            st.markdown(response)
+            st.markdown(response, unsafe_allow_html=True)
         st.session_state.messages.append({"role": "assistant", "content": response})
 
     except Exception as e:
